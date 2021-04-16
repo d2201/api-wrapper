@@ -12,6 +12,10 @@ In `dependencies` add line and run `yarn` or `npm install`.
 "@sdk/base": "d2201/api-wrapper"
 ```
 
+## Configuration
+
+For a working SDK look up to `config.example.ini`. Based on this file please create file `config.ini`.
+
 ## Usage
 
 API Wrapper as a base for `SDKs` should be only extended in classes
