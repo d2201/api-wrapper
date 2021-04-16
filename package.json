@@ -1,0 +1,26 @@
+{
+  "name": "@sdk/base",
+  "version": "1.0.0",
+  "scripts": {
+    "prettify": "prettier -l --config .prettierrc --write \"**/*.{ts,tsx,js,json}\" && yarn lint:fix",
+    "lint:fix": "eslint --ext .ts,.tsx --fix ."
+  },
+  "description": "Base for creating SDKs",
+  "main": "build/index.js",
+  "repository": "https://github.com/d2201/api-wrapper.git",
+  "author": "d2201",
+  "license": "GPL-3.0",
+  "private": false,
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^4.22.0",
+    "eslint": "^7.24.0",
+    "eslint-config-airbnb-typescript": "^12.3.1",
+    "eslint-config-prettier": "^8.2.0",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-prettier": "^3.4.0",
+    "prettier": "^2.2.1"
+  },
+  "dependencies": {
+    "typescript": "^4.2.4"
+  }
+}
