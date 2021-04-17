@@ -1,25 +1,74 @@
-import axios, { AxiosRequestConfig } from 'axios'
+import axios, { AxiosError, AxiosRequestConfig } from 'axios'
+import { promisify } from 'util'
+
+const sleep = promisify(setTimeout)
 
 export default class ApiBase {
-  private url: string
+  private isAuthorized = false
 
-  constructor(url: string) {
-    this.url = url
-    // todo...
+  private apiConfig: WrapperConfig
+
+  constructor(config: WrapperConfig) {
+    this.apiConfig = config
   }
 
-  getAxiosConfig(config: Config): AxiosRequestConfig {
+  private getAxiosConfig(config: Config): AxiosRequestConfig {
     return {
       headers: config.headers,
-      url: config.url || `${this.url}${config.path}`,
+      url: config.url || `${this.apiConfig.baseUrl}${config.path}`,
       method: config.method,
     }
   }
 
-  protected async request<Response>(config: Config): Promise<Response> {
-    const response = await axios.request<Response>(this.getAxiosConfig(config))
+  /**
+   * It is recommended to implement your own authorize method.
+   */
+  protected async authorize() {
+    this.isAuthorized = true
+  }
 
-    return response.data
+  protected async request<Response>(config: Config): Promise<Response> {
+    try {
+      const response = await axios.request<Response>(this.getAxiosConfig(config))
+      return response.data
+    } catch (e) {
+      const errorCount = config.errorCount || 0
+
+      if (this.apiConfig.maxErrorCount >= errorCount) {
+        throw e
+      }
+
+      const newConfig = {
+        ...config,
+        errorCount: errorCount + 1,
+      }
+
+      const error: AxiosError = e
+
+      if (!error.isAxiosError || !error.response) {
+        await sleep(this.apiConfig.sleepDurationOnError.network)
+
+        return this.request(newConfig)
+      }
+
+      if (error.response.status === 429) {
+        await sleep(this.apiConfig.sleepDurationOnError.rateLimit)
+
+        return this.request(newConfig)
+      }
+
+      if (error.response.status === 503) {
+        await sleep(this.apiConfig.sleepDurationOnError.serviceUnavailable)
+
+        return this.request(newConfig)
+      }
+
+      if (this.apiConfig.repeatOnUnknownError) {
+        return this.request(newConfig)
+      } 
+        throw e
+      
+    }
   }
 }
 
@@ -34,4 +83,19 @@ type Config = {
   method?: 'GET' | 'POST' | 'PUT' | 'DELETE'
   url?: string
   requireAuthorization?: boolean
+  errorCount?: number
+}
+
+type WrapperConfig = {
+  requestsRateLimit: number
+  baseUrl: string
+
+  // error settings
+  maxErrorCount: number
+  sleepDurationOnError: {
+    network: number
+    rateLimit: number
+    serviceUnavailable: number
+  }
+  repeatOnUnknownError: boolean
 }
