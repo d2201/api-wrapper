@@ -29,6 +29,10 @@ export default class ApiBase {
 
   protected async request<Response>(config: Config): Promise<Response> {
     try {
+      if (config.requireAuthorization !== false) {
+        await this.authorize()
+      }
+
       const response = await axios.request<Response>(this.getAxiosConfig(config))
       return response.data
     } catch (e) {
@@ -65,9 +69,8 @@ export default class ApiBase {
 
       if (this.apiConfig.repeatOnUnknownError) {
         return this.request(newConfig)
-      } 
-        throw e
-      
+      }
+      throw e
     }
   }
 }
