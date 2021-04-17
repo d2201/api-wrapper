@@ -2,11 +2,13 @@
   "name": "@sdk/base",
   "version": "1.0.0",
   "scripts": {
+    "build": "tsc",
+    "prepare": "yarn build",
     "prettify": "prettier -l --config .prettierrc --write \"**/*.{ts,tsx,js,json}\" && yarn lint:fix",
     "lint:fix": "eslint --ext .ts,.tsx --fix ."
   },
   "description": "Base for creating SDKs",
-  "main": "lib/index.ts",
+  "main": "build/index.js",
   "repository": "https://github.com/d2201/api-wrapper.git",
   "author": "d2201",
   "license": "GPL-3.0",
