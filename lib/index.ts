@@ -1,10 +1,14 @@
-import axios, { AxiosError, AxiosRequestConfig } from 'axios'
+import axios, { AxiosError, AxiosRequestConfig, AxiosBasicCredentials } from 'axios'
 import { promisify } from 'util'
 
 const sleep = promisify(setTimeout)
 
 export default class ApiBase {
   private isAuthorized = false
+
+  protected defaultHeaders = {}
+
+  protected authorizationHeaders = {}
 
   private apiConfig: WrapperConfig
 
@@ -13,10 +17,19 @@ export default class ApiBase {
   }
 
   private getAxiosConfig(config: Config): AxiosRequestConfig {
+    let headers = this.defaultHeaders
+
+    if (config.requireAuthorization) {
+      headers = { ...this.authorizationHeaders }
+    }
+
+    headers = { ...headers, ...config.headers }
+
     return {
-      headers: config.headers,
+      headers,
       url: config.url || `${this.apiConfig.baseUrl}${config.path}`,
       method: config.method,
+      auth: config.auth,
     }
   }
 
@@ -29,7 +42,7 @@ export default class ApiBase {
 
   protected async request<Response>(config: Config): Promise<Response> {
     try {
-      if (config.requireAuthorization !== false) {
+      if (!this.isAuthorized && config.requireAuthorization !== false) {
         await this.authorize()
       }
 
@@ -87,6 +100,7 @@ type Config = {
   url?: string
   requireAuthorization?: boolean
   errorCount?: number
+  auth?: AxiosBasicCredentials
 }
 
 type WrapperConfig = {
