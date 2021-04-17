@@ -27,9 +27,10 @@ export default class ApiBase {
 
     return {
       headers,
-      url: config.url || `${this.apiConfig.baseUrl}${config.path}`,
+      url: `${config.url}${config.path}` || `${this.apiConfig.baseUrl}${config.path}`,
       method: config.method,
       auth: config.auth,
+      data: config.data,
     }
   }
 
@@ -98,6 +99,7 @@ type Config = {
   headers?: object
   method?: 'GET' | 'POST' | 'PUT' | 'DELETE'
   url?: string
+  data?: any
   requireAuthorization?: boolean
   errorCount?: number
   auth?: AxiosBasicCredentials
