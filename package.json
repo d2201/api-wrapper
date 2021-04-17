@@ -6,7 +6,7 @@
     "lint:fix": "eslint --ext .ts,.tsx --fix ."
   },
   "description": "Base for creating SDKs",
-  "main": "build/index.js",
+  "main": "lib/index.ts",
   "repository": "https://github.com/d2201/api-wrapper.git",
   "author": "d2201",
   "license": "GPL-3.0",
