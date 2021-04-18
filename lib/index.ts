@@ -3,12 +3,18 @@ import { promisify } from 'util'
 
 const sleep = promisify(setTimeout)
 
+const ONE_SECOND = 1000
+
 export default class ApiBase {
-  private isAuthorized = false
+  protected isAuthorized = false
 
   protected defaultHeaders = {}
 
   protected authorizationHeaders = {}
+
+  private requestsCount = 0
+
+  private nextRefreshAt: Date = new Date()
 
   private apiConfig: WrapperConfig
 
@@ -34,6 +40,19 @@ export default class ApiBase {
     }
   }
 
+  private async checkRateLimit() {
+    const now = new Date()
+
+    if (now > this.nextRefreshAt) {
+      this.requestsCount = 0
+      this.nextRefreshAt = new Date(+now + 60 * ONE_SECOND) // refresh in next minute
+    }
+
+    if (++this.requestsCount >= this.apiConfig.requestsRateLimit) {
+      await sleep(+this.nextRefreshAt - +now) // sleep until next block, next request will reset the counter.
+    }
+  }
+
   /**
    * It is recommended to implement your own authorize method.
    */
@@ -43,6 +62,8 @@ export default class ApiBase {
 
   protected async request<Response>(config: Config): Promise<Response> {
     try {
+      await this.checkRateLimit()
+
       if (!this.isAuthorized && config.requireAuthorization !== false) {
         await this.authorize()
       }
@@ -90,6 +111,7 @@ export default class ApiBase {
 }
 
 /**
+ * @param {number} requestsRateLimit - Rate limit per minute.
  * @param {string} path - Will be appended to the base url specified in `config.ini`
  * @param {string | undefined} url - If specified then it will override used path
  * @param {boolean} requireAuthorization - By default it is set to `true`.

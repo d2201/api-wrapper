@@ -6,11 +6,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const axios_1 = __importDefault(require("axios"));
 const util_1 = require("util");
 const sleep = util_1.promisify(setTimeout);
+const ONE_SECOND = 1000;
 class ApiBase {
     constructor(config) {
         this.isAuthorized = false;
         this.defaultHeaders = {};
         this.authorizationHeaders = {};
+        this.requestsCount = 0;
+        this.nextRefreshAt = new Date();
         this.apiConfig = config;
     }
     getAxiosConfig(config) {
@@ -27,6 +30,16 @@ class ApiBase {
             data: config.data,
         };
     }
+    async checkRateLimit() {
+        const now = new Date();
+        if (now > this.nextRefreshAt) {
+            this.requestsCount = 0;
+            this.nextRefreshAt = new Date(+now + 60 * ONE_SECOND); // refresh in next minute
+        }
+        if (++this.requestsCount >= this.apiConfig.requestsRateLimit) {
+            await sleep(+this.nextRefreshAt - +now); // sleep until next block, next request will reset the counter.
+        }
+    }
     /**
      * It is recommended to implement your own authorize method.
      */
@@ -35,6 +48,7 @@ class ApiBase {
     }
     async request(config) {
         try {
+            await this.checkRateLimit();
             if (!this.isAuthorized && config.requireAuthorization !== false) {
                 await this.authorize();
             }

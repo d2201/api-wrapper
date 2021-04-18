@@ -1,11 +1,14 @@
 import { AxiosBasicCredentials } from 'axios';
 export default class ApiBase {
-    private isAuthorized;
+    protected isAuthorized: boolean;
     protected defaultHeaders: {};
     protected authorizationHeaders: {};
+    private requestsCount;
+    private nextRefreshAt;
     private apiConfig;
     constructor(config: WrapperConfig);
     private getAxiosConfig;
+    private checkRateLimit;
     /**
      * It is recommended to implement your own authorize method.
      */
@@ -13,6 +16,7 @@ export default class ApiBase {
     protected request<Response>(config: Config): Promise<Response>;
 }
 /**
+ * @param {number} requestsRateLimit - Rate limit per minute.
  * @param {string} path - Will be appended to the base url specified in `config.ini`
  * @param {string | undefined} url - If specified then it will override used path
  * @param {boolean} requireAuthorization - By default it is set to `true`.
