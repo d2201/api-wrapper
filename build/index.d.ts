@@ -18,7 +18,7 @@ export default class ApiBase {
 /**
  * @param {number} requestsRateLimit - Rate limit per minute.
  * @param {string} path - Will be appended to the base url specified in `config.ini`
- * @param {string | undefined} url - If specified then it will override used path
+ * @param {string | undefined} url - If specified then it will override `baseUrl`
  * @param {boolean} requireAuthorization - By default it is set to `true`.
  */
 declare type Config = {
@@ -30,6 +30,7 @@ declare type Config = {
     requireAuthorization?: boolean;
     errorCount?: number;
     auth?: AxiosBasicCredentials;
+    queryParams?: object;
 };
 declare type WrapperConfig = {
     requestsRateLimit: number;

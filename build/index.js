@@ -28,6 +28,7 @@ class ApiBase {
             method: config.method,
             auth: config.auth,
             data: config.data,
+            params: config.queryParams,
         };
     }
     async checkRateLimit() {
