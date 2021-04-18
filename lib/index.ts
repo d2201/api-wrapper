@@ -25,7 +25,7 @@ export default class ApiBase {
   private getAxiosConfig(config: Config): AxiosRequestConfig {
     let headers = this.defaultHeaders
 
-    if (config.requireAuthorization) {
+    if (config.requireAuthorization || config.requireAuthorization === undefined) {
       headers = { ...this.authorizationHeaders }
     }
 
