@@ -19,7 +19,7 @@ class ApiBase {
     getAxiosConfig(config) {
         let headers = this.defaultHeaders;
         if (config.requireAuthorization || config.requireAuthorization === undefined) {
-            headers = { ...this.authorizationHeaders };
+            headers = { ...headers, ...this.authorizationHeaders };
         }
         headers = { ...headers, ...config.headers };
         return {
