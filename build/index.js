@@ -24,7 +24,7 @@ class ApiBase {
         headers = { ...headers, ...config.headers };
         return {
             headers,
-            url: `${config.url}${config.path}` || `${this.apiConfig.baseUrl}${config.path}`,
+            url: config.url ? `${config.url}${config.path}` : `${this.apiConfig.baseUrl}${config.path}`,
             method: config.method,
             auth: config.auth,
             data: config.data,
