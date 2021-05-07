@@ -74,7 +74,7 @@ export default class ApiBase {
     } catch (e) {
       const errorCount = config.errorCount || 0
 
-      if (this.apiConfig.maxErrorCount >= errorCount) {
+      if (errorCount >= this.apiConfig.maxErrorCount) {
         throw e
       }
 
