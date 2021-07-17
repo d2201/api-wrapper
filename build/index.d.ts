@@ -24,7 +24,7 @@ export default class ApiBase {
 declare type Config = {
     path: string;
     headers?: object;
-    method?: 'GET' | 'POST' | 'PUT' | 'DELETE';
+    method?: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
     url?: string;
     data?: any;
     requireAuthorization?: boolean;

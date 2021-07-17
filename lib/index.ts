@@ -120,7 +120,7 @@ export default class ApiBase {
 type Config = {
   path: string
   headers?: object
-  method?: 'GET' | 'POST' | 'PUT' | 'DELETE'
+  method?: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH'
   url?: string
   data?: any
   requireAuthorization?: boolean
